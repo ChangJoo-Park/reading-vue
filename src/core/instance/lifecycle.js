@@ -21,6 +21,7 @@ export let activeInstance: any = null
 export let isUpdatingChildComponent: boolean = false
 
 export function initLifecycle (vm: Component) {
+  console.error('[initLifecycle] START')
   const options = vm.$options
 
   // locate first non-abstract parent
@@ -44,10 +45,13 @@ export function initLifecycle (vm: Component) {
   vm._isMounted = false
   vm._isDestroyed = false
   vm._isBeingDestroyed = false
+  console.error('[initLifecycle] END')
 }
 
 export function lifecycleMixin (Vue: Class<Component>) {
+  console.error('[lifecycleMixin] START');
   Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
+    console.error('[lifecycleMixin#_update] START');
     const vm: Component = this
     if (vm._isMounted) {
       callHook(vm, 'beforeUpdate')
@@ -87,18 +91,23 @@ export function lifecycleMixin (Vue: Class<Component>) {
     }
     // updated hook is called by the scheduler to ensure that children are
     // updated in a parent's updated hook.
+    console.error('[lifecycleMixin#_update] END');
   }
 
   Vue.prototype.$forceUpdate = function () {
+    console.error('[lifecycleMixin#$forceUpdate] START');
     const vm: Component = this
     if (vm._watcher) {
       vm._watcher.update()
     }
+    console.error('[lifecycleMixin#$forceUpdate] END');
   }
 
   Vue.prototype.$destroy = function () {
+    console.error('[lifecycleMixin#$destroy] START');
     const vm: Component = this
     if (vm._isBeingDestroyed) {
+      console.error('[lifecycleMixin#$destroy] END');
       return
     }
     callHook(vm, 'beforeDestroy')
@@ -133,7 +142,9 @@ export function lifecycleMixin (Vue: Class<Component>) {
     if (vm.$el) {
       vm.$el.__vue__ = null
     }
+    console.error('[lifecycleMixin#$destroy] END');
   }
+  console.error('[lifecycleMixin] END');
 }
 
 export function mountComponent (
@@ -141,6 +152,7 @@ export function mountComponent (
   el: ?Element,
   hydrating?: boolean
 ): Component {
+  console.error('[mountComponent] START');
   vm.$el = el
   if (!vm.$options.render) {
     vm.$options.render = createEmptyVNode
@@ -198,6 +210,7 @@ export function mountComponent (
     vm._isMounted = true
     callHook(vm, 'mounted')
   }
+  console.error('[mountComponent] END');
   return vm
 }
 
@@ -208,6 +221,7 @@ export function updateChildComponent (
   parentVnode: VNode,
   renderChildren: ?Array<VNode>
 ) {
+  console.error('[updateChildComponent] START');
   if (process.env.NODE_ENV !== 'production') {
     isUpdatingChildComponent = true
   }
@@ -264,22 +278,29 @@ export function updateChildComponent (
   if (process.env.NODE_ENV !== 'production') {
     isUpdatingChildComponent = false
   }
+  console.error('[updateChildComponent] END');
 }
 
 function isInInactiveTree (vm) {
+  console.error('[isInInactiveTree] START')
   while (vm && (vm = vm.$parent)) {
+    console.error('[isInInactiveTree] END')
     if (vm._inactive) return true
   }
+  console.error('[isInInactiveTree] END')
   return false
 }
 
 export function activateChildComponent (vm: Component, direct?: boolean) {
+  console.error('[activateChildComponent] START');
   if (direct) {
     vm._directInactive = false
     if (isInInactiveTree(vm)) {
+      console.error('[activateChildComponent] END');
       return
     }
   } else if (vm._directInactive) {
+    console.error('[activateChildComponent] END');
     return
   }
   if (vm._inactive || vm._inactive === null) {
@@ -289,12 +310,15 @@ export function activateChildComponent (vm: Component, direct?: boolean) {
     }
     callHook(vm, 'activated')
   }
+  console.error('[activateChildComponent] END');
 }
 
 export function deactivateChildComponent (vm: Component, direct?: boolean) {
+  console.error('[deactivateChildComponent] START');
   if (direct) {
     vm._directInactive = true
     if (isInInactiveTree(vm)) {
+      console.error('[deactivateChildComponent] END');
       return
     }
   }
@@ -305,9 +329,11 @@ export function deactivateChildComponent (vm: Component, direct?: boolean) {
     }
     callHook(vm, 'deactivated')
   }
+  console.error('[deactivateChildComponent] END');
 }
 
 export function callHook (vm: Component, hook: string) {
+  console.log('[callHook] START')
   const handlers = vm.$options[hook]
   if (handlers) {
     for (let i = 0, j = handlers.length; i < j; i++) {
@@ -321,4 +347,5 @@ export function callHook (vm: Component, hook: string) {
   if (vm._hasHookEvent) {
     vm.$emit('hook:' + hook)
   }
+  console.log('[callHook] END')
 }

@@ -10,13 +10,16 @@ import {
 import { updateListeners } from '../vdom/helpers/index'
 
 export function initEvents (vm: Component) {
+  console.error('[initEvents] START');
   vm._events = Object.create(null)
   vm._hasHookEvent = false
   // init parent attached events
   const listeners = vm.$options._parentListeners
   if (listeners) {
+    console.error('[initEvents] CAll updateComponentListeners when has listeners');
     updateComponentListeners(vm, listeners)
   }
+  console.error('[initEvents] END');
 }
 
 let target: Component
@@ -38,13 +41,18 @@ export function updateComponentListeners (
   listeners: Object,
   oldListeners: ?Object
 ) {
+  console.error('[updateComponentListeners] START');
   target = vm
+  console.error('[updateComponentListeners] Call updateListeners');
   updateListeners(listeners, oldListeners || {}, add, remove, vm)
+  console.error('[updateComponentListeners] END');
 }
 
 export function eventsMixin (Vue: Class<Component>) {
+  console.error('[eventsMixin] START')
   const hookRE = /^hook:/
   Vue.prototype.$on = function (event: string | Array<string>, fn: Function): Component {
+    console.error('[$on] START')
     const vm: Component = this
     if (Array.isArray(event)) {
       for (let i = 0, l = event.length; i < l; i++) {
@@ -58,10 +66,12 @@ export function eventsMixin (Vue: Class<Component>) {
         vm._hasHookEvent = true
       }
     }
+    console.error('[$on] END')
     return vm
   }
 
   Vue.prototype.$once = function (event: string, fn: Function): Component {
+    console.error('[$once] START')
     const vm: Component = this
     function on () {
       vm.$off(event, on)
@@ -69,13 +79,16 @@ export function eventsMixin (Vue: Class<Component>) {
     }
     on.fn = fn
     vm.$on(event, on)
+    console.error('[$once] END')
     return vm
   }
 
   Vue.prototype.$off = function (event?: string | Array<string>, fn?: Function): Component {
+    console.error('[$off] START')
     const vm: Component = this
     // all
     if (!arguments.length) {
+      console.error('[$off] END')
       vm._events = Object.create(null)
       return vm
     }
@@ -84,15 +97,18 @@ export function eventsMixin (Vue: Class<Component>) {
       for (let i = 0, l = event.length; i < l; i++) {
         this.$off(event[i], fn)
       }
+      console.error('[$off] END')
       return vm
     }
     // specific event
     const cbs = vm._events[event]
     if (!cbs) {
+      console.error('[$off] END')
       return vm
     }
     if (arguments.length === 1) {
       vm._events[event] = null
+      console.error('[$off] END')
       return vm
     }
     // specific handler
@@ -105,10 +121,12 @@ export function eventsMixin (Vue: Class<Component>) {
         break
       }
     }
+    console.error('[$off] END')
     return vm
   }
 
   Vue.prototype.$emit = function (event: string): Component {
+    console.error('[$emit] START');
     const vm: Component = this
     if (process.env.NODE_ENV !== 'production') {
       const lowerCaseEvent = event.toLowerCase()
@@ -134,6 +152,8 @@ export function eventsMixin (Vue: Class<Component>) {
         }
       }
     }
+    console.error('[$emit] END');
     return vm
   }
+  console.error('[eventsMixin] END')
 }

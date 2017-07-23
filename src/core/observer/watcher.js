@@ -45,6 +45,7 @@ export default class Watcher {
     cb: Function,
     options?: Object
   ) {
+    console.error('[Watcher] START constructor')
     this.vm = vm
     vm._watchers.push(this)
     // options
@@ -85,6 +86,8 @@ export default class Watcher {
     this.value = this.lazy
       ? undefined
       : this.get()
+
+    console.error('[Watcher] END constructor')
   }
 
   /**

@@ -20,6 +20,7 @@ export class CodegenState {
   staticRenderFns: Array<string>;
 
   constructor (options: CompilerOptions) {
+    console.error('[CodegenState#constructor] START')
     this.options = options
     this.warn = options.warn || baseWarn
     this.transforms = pluckModuleFunction(options.modules, 'transformCode')
@@ -29,6 +30,7 @@ export class CodegenState {
     this.maybeComponent = (el: ASTElement) => !isReservedTag(el.tag)
     this.onceId = 0
     this.staticRenderFns = []
+    console.error('[CodegenState#constructor] END')
   }
 }
 
@@ -41,8 +43,10 @@ export function generate (
   ast: ASTElement | void,
   options: CompilerOptions
 ): CodegenResult {
+  console.error('[CodegenState#generate] START')
   const state = new CodegenState(options)
   const code = ast ? genElement(ast, state) : '_c("div")'
+  console.error('[CodegenState#generate] END')
   return {
     render: `with(this){return ${code}}`,
     staticRenderFns: state.staticRenderFns
@@ -50,19 +54,27 @@ export function generate (
 }
 
 export function genElement (el: ASTElement, state: CodegenState): string {
+  console.error('[CodegenState#genElement] START')
   if (el.staticRoot && !el.staticProcessed) {
+    console.error('[CodegenState#genElement] END - genStatic')
     return genStatic(el, state)
   } else if (el.once && !el.onceProcessed) {
+    console.error('[CodegenState#genElement] END - genOnce')
     return genOnce(el, state)
   } else if (el.for && !el.forProcessed) {
+    console.error('[CodegenState#genElement] END - genFor')
     return genFor(el, state)
   } else if (el.if && !el.ifProcessed) {
+    console.error('[CodegenState#genElement] END - genIf')
     return genIf(el, state)
   } else if (el.tag === 'template' && !el.slotTarget) {
+    console.error('[CodegenState#genElement] END - genChildren')
     return genChildren(el, state) || 'void 0'
   } else if (el.tag === 'slot') {
+    console.error('[CodegenState#genElement] END - genSlot')
     return genSlot(el, state)
   } else {
+    console.error('[CodegenState#genElement] END - others')
     // component or element
     let code
     if (el.component) {

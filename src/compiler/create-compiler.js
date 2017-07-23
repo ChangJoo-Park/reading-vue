@@ -5,11 +5,14 @@ import { detectErrors } from './error-detector'
 import { createCompileToFunctionFn } from './to-function'
 
 export function createCompilerCreator (baseCompile: Function): Function {
+  console.error('[createCompilerCreator] CALLED')
   return function createCompiler (baseOptions: CompilerOptions) {
+    console.error('[createCompilerCreator#createCompiler] =================START=================')
     function compile (
       template: string,
       options?: CompilerOptions
     ): CompiledResult {
+      console.error('[createCompilerCreator#createCompiler#compile] =================START=================')
       const finalOptions = Object.create(baseOptions)
       const errors = []
       const tips = []
@@ -44,9 +47,10 @@ export function createCompilerCreator (baseCompile: Function): Function {
       }
       compiled.errors = errors
       compiled.tips = tips
+      console.error('[createCompilerCreator#createCompiler#compile] =================END=================')
       return compiled
     }
-
+    console.error('[createCompilerCreator#createCompiler] =================END=================')
     return {
       compile,
       compileToFunctions: createCompileToFunctionFn(compile)

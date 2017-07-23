@@ -44,22 +44,37 @@ export function proxy (target: Object, sourceKey: string, key: string) {
 }
 
 export function initState (vm: Component) {
+  console.error('[initState] START')
   vm._watchers = []
   const opts = vm.$options
-  if (opts.props) initProps(vm, opts.props)
-  if (opts.methods) initMethods(vm, opts.methods)
+  if (opts.props) {
+    console.error('[initState] call initProps when has props')
+    initProps(vm, opts.props)
+  }
+  if (opts.methods) {
+    console.error('[initState] call initMethods when has methods')
+    initMethods(vm, opts.methods)
+  }
   if (opts.data) {
+    console.error('[initState] call initData when has data')
     initData(vm)
   } else {
+    console.error('[initState] set empty observer when has not data')
     observe(vm._data = {}, true /* asRootData */)
   }
-  if (opts.computed) initComputed(vm, opts.computed)
+  if (opts.computed) {
+    console.error('[initState] call initComputed when has computed')
+    initComputed(vm, opts.computed)
+  }
   if (opts.watch && opts.watch !== nativeWatch) {
+    console.error('[initState] call initWatch when has watch')
     initWatch(vm, opts.watch)
   }
+  console.error('[initState] END')
 }
 
 function checkOptionType (vm: Component, name: string) {
+  console.error('[checkOptionType] START')
   const option = vm.$options[name]
   if (!isPlainObject(option)) {
     warn(
@@ -67,9 +82,11 @@ function checkOptionType (vm: Component, name: string) {
       vm
     )
   }
+  console.error('[checkOptionType] END')
 }
 
 function initProps (vm: Component, propsOptions: Object) {
+  console.error('[initProps] START')
   const propsData = vm.$options.propsData || {}
   const props = vm._props = {}
   // cache prop keys so that future props updates can iterate using Array
@@ -111,9 +128,11 @@ function initProps (vm: Component, propsOptions: Object) {
     }
   }
   observerState.shouldConvert = true
+  console.error('[initProps] END')
 }
 
 function initData (vm: Component) {
+  console.error('[initData] START')
   let data = vm.$options.data
   data = vm._data = typeof data === 'function'
     ? getData(data, vm)
@@ -153,6 +172,7 @@ function initData (vm: Component) {
   }
   // observe data
   observe(data, true /* asRootData */)
+  console.error('[initData] END')
 }
 
 function getData (data: Function, vm: Component): any {
@@ -167,6 +187,7 @@ function getData (data: Function, vm: Component): any {
 const computedWatcherOptions = { lazy: true }
 
 function initComputed (vm: Component, computed: Object) {
+  console.error('[initComputed] START')
   process.env.NODE_ENV !== 'production' && checkOptionType(vm, 'computed')
   const watchers = vm._computedWatchers = Object.create(null)
 
@@ -195,9 +216,11 @@ function initComputed (vm: Component, computed: Object) {
       }
     }
   }
+  console.error('[initComputed] END')
 }
 
 export function defineComputed (target: any, key: string, userDef: Object | Function) {
+  console.error('[defineComputed] START')
   if (typeof userDef === 'function') {
     sharedPropertyDefinition.get = createComputedGetter(key)
     sharedPropertyDefinition.set = noop
@@ -221,6 +244,7 @@ export function defineComputed (target: any, key: string, userDef: Object | Func
     }
   }
   Object.defineProperty(target, key, sharedPropertyDefinition)
+  console.error('[defineComputed] END')
 }
 
 function createComputedGetter (key) {
@@ -239,6 +263,7 @@ function createComputedGetter (key) {
 }
 
 function initMethods (vm: Component, methods: Object) {
+  console.error('[initMethods] START');
   process.env.NODE_ENV !== 'production' && checkOptionType(vm, 'methods')
   const props = vm.$options.props
   for (const key in methods) {
@@ -259,9 +284,11 @@ function initMethods (vm: Component, methods: Object) {
       }
     }
   }
+  console.error('[initMethods] END');
 }
 
 function initWatch (vm: Component, watch: Object) {
+  console.error('[initWatch] START');
   process.env.NODE_ENV !== 'production' && checkOptionType(vm, 'watch')
   for (const key in watch) {
     const handler = watch[key]
@@ -273,6 +300,7 @@ function initWatch (vm: Component, watch: Object) {
       createWatcher(vm, key, handler)
     }
   }
+  console.error('[initWatch] END');
 }
 
 function createWatcher (
@@ -281,6 +309,7 @@ function createWatcher (
   handler: any,
   options?: Object
 ) {
+  console.error('[createWatcher] START')
   if (isPlainObject(handler)) {
     options = handler
     handler = handler.handler
@@ -288,10 +317,12 @@ function createWatcher (
   if (typeof handler === 'string') {
     handler = vm[handler]
   }
+  console.error('[createWatcher] END')
   return vm.$watch(keyOrFn, handler, options)
 }
 
 export function stateMixin (Vue: Class<Component>) {
+  console.error('[stateMixin] START')
   // flow somehow has problems with directly declared definition object
   // when using Object.defineProperty, so we have to procedurally build up
   // the object here.
@@ -311,19 +342,23 @@ export function stateMixin (Vue: Class<Component>) {
       warn(`$props is readonly.`, this)
     }
   }
+  console.error('[stateMixin] defineProperty $data, $props')
   Object.defineProperty(Vue.prototype, '$data', dataDef)
   Object.defineProperty(Vue.prototype, '$props', propsDef)
 
   Vue.prototype.$set = set
   Vue.prototype.$delete = del
 
+  console.error('[stateMixin] define $watch')
   Vue.prototype.$watch = function (
     expOrFn: string | Function,
     cb: any,
     options?: Object
   ): Function {
+    console.error('[Vue.$watch] START')
     const vm: Component = this
     if (isPlainObject(cb)) {
+      console.error('[Vue.$watch] createWatcher when cb is PlainObject')
       return createWatcher(vm, expOrFn, cb, options)
     }
     options = options || {}
@@ -332,8 +367,11 @@ export function stateMixin (Vue: Class<Component>) {
     if (options.immediate) {
       cb.call(vm, watcher.value)
     }
+    console.error('[Vue.$watch] END')
     return function unwatchFn () {
+      console.error('[Vue.$watch#unwatchFn] Called unwatchFn');
       watcher.teardown()
     }
   }
+  console.error('[stateMixin] END')
 }

@@ -31,6 +31,7 @@ import { bindObjectListeners } from './render-helpers/bind-object-listeners'
 import { resolveSlots, resolveScopedSlots } from './render-helpers/resolve-slots'
 
 export function initRender (vm: Component) {
+  console.error('[initRender] START');
   vm._vnode = null // the root of the child tree
   vm._staticTrees = null
   const parentVnode = vm.$vnode = vm.$options._parentVnode // the placeholder node in parent tree
@@ -61,9 +62,11 @@ export function initRender (vm: Component) {
     defineReactive(vm, '$attrs', parentData && parentData.attrs, null, true)
     defineReactive(vm, '$listeners', vm.$options._parentListeners, null, true)
   }
+  console.error('[initRender] END');
 }
 
 export function renderMixin (Vue: Class<Component>) {
+  console.error('[renderMixin] START')
   Vue.prototype.$nextTick = function (fn: Function) {
     return nextTick(fn, this)
   }
@@ -142,4 +145,5 @@ export function renderMixin (Vue: Class<Component>) {
   Vue.prototype._e = createEmptyVNode
   Vue.prototype._u = resolveScopedSlots
   Vue.prototype._g = bindObjectListeners
+  console.error('[renderMixin] END')
 }
